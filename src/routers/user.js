@@ -3,60 +3,41 @@ const User = require("../models/user");
 const auth = require("../middleware/auth");
 const multer = require("multer");
 const sharp = require("sharp");
-const { sendWelcomeEmail, sendFarewellEmail } = require("../emails/account");
+const passport = require("passport");
 const router = new express.Router();
 
+// Register account
 router.post("/users", async (req, res) => {
   const user = new User(req.body);
   try {
     await user.save();
-    sendWelcomeEmail(user.email, user.name);
-    const token = await user.generateAuthToken();
-    res.status(201).send({ user, token });
+    res.status(201).send({ user });
   } catch (e) {
     res.status(400).send(e);
   }
 });
 
-router.post("/users/login", async (req, res) => {
-  try {
-    const user = await User.findByCredentials(
-      req.body.email,
-      req.body.password
-    );
-    const token = await user.generateAuthToken();
-    res.send({ user, token });
-  } catch (e) {
+// Login
+router.post(
+  "/users/login",
+  passport.authenticate("local", (err, user) => {
+    if (!err) return res.send({ user });
     res.status(400).send("Unable to authenticate");
-  }
-});
+  })
+);
 
+//Logout of account
 router.post("/users/logout", auth, async (req, res) => {
-  try {
-    req.user.tokens = req.user.tokens.filter((token) => {
-      return token.token !== req.token;
-    });
-    await req.user.save();
-    res.send();
-  } catch (e) {
-    res.status(500).send();
-  }
+  req.logout();
+  res.status(201).send("Succssful");
 });
 
-router.post("/users/logoutAll", auth, async (req, res) => {
-  try {
-    req.user.tokens = [];
-    await req.user.save();
-    res.send();
-  } catch (e) {
-    res.status(500).send();
-  }
-});
-
+//View profile
 router.get("/users/me", auth, async (req, res) => {
   res.send(req.user);
 });
 
+//Update profile
 router.patch("/users/me", auth, async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ["name", "email", "password", "age"];
@@ -79,16 +60,17 @@ router.patch("/users/me", auth, async (req, res) => {
   }
 });
 
+//Deactivate your account
 router.delete("/users/me", auth, async (req, res) => {
   try {
     await req.user.remove();
-    sendFarewellEmail(req.user.email, req.user.name);
     res.status(201).send(req.user);
   } catch (e) {
     res.status(400).send();
   }
 });
 
+//Add a photo to your profile
 const upload = multer({
   limits: {
     fileSize: 10000000,
@@ -125,12 +107,14 @@ router.post(
   }
 );
 
+//Remove profile picture
 router.delete("/users/me/avatar", auth, async (req, res) => {
   req.user.avatar = undefined;
   await req.user.save();
   res.status(200).send();
 });
 
+//Get profile picture
 router.get("/users/:id/avatar", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);

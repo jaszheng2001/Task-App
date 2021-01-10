@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <title>Register</title>
+  </head>
+  <body>
+    <div class="center">
+      <form id="registerForm" action="/users" method="POST" autocomplete="off">
+        <h1>CREATE ACCOUNT</h1>
+        <input type="text" name="name" id="name" placeholder="Name" required />
+        <input
+          type="email"
+          name="email"
+          id="email"
+          placeholder="Email"
+          required
+        />
+        <input
+          type="password"
+          name="password"
+          id="password"
+          value=""
+          placeholder="Password"
+          required
+        />
+        <p style="color: red" id="errMsg"><%=error%></p>
+        <p style="color: red" id="passwordValidation">
+          Password must be at least 8 characters
+        </p>
+        <input type="submit" value="Register" id="registerBtn" />
+        <p>Have an account? <a href="/">Login here</a></p>
+      </form>
+    </div>
+    <%- include ('partials/footer') %>
+  </body>
+  <script type="text/javascript" src="js/register.js"></script>
+</html>

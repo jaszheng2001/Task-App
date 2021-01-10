@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <title>Home</title>
+  </head>
+  <body>
+    <div class="center">
+      <form action="/login" method="POST" id="loginForm" autocomplete="off">
+        <h1>LOGIN</h1>
+        <p style="color: red; text-align: center"><%= error%></p>
+        <p>Email:</p>
+        <input type="email" name="email" id="email" required />
+        <p>Password:</p>
+        <input type="password" name="password" id="password" required />
+        <input type="submit" value="Login" />
+        <p style="text-align: center">
+          <a href="/register">Click here to register for a new account</a>
+        </p>
+      </form>
+    </div>
+
+    <%- include ('partials/footer') %>
+  </body>
+</html>

@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const Task = require("../models/task");
 require("dotenv").config();
 
@@ -31,7 +30,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 7,
+      minlength: 8,
       trim: true,
       validate(value) {
         if (value.toLowerCase().includes("password")) {
@@ -60,18 +59,9 @@ userSchema.virtual("tasks", {
   foreignField: "owner",
 });
 
-userSchema.methods.generateAuthToken = async function () {
-  const user = this;
-  const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET);
-  user.tokens = user.tokens.concat({ token });
-  await user.save();
-  return token;
-};
-
 userSchema.methods.toJSON = function () {
   const user = this;
   const userObject = user.toObject();
-
   delete userObject.password;
   delete userObject.tokens;
   delete userObject.avatar;

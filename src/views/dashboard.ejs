@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <header id="heading">
+      <h1>Welcome <%=name%></h1>
+      <a href="../logout">Log out</a>
+    </header>
+    <div>
+      <form
+        action="/tasks"
+        method="post"
+        id="tasksubmission"
+        autocomplete="off"
+      >
+        <div>
+          <input
+            type="text"
+            name="description"
+            placeholder="Enter a task"
+            id="taskInput"
+            value=""
+          />
+          <button type="submit" id="submitBtn">+</button>
+        </div>
+        <div>
+          <label for="sortBy">Sort: </label>
+          <select id="sortBy" name="sortBy">
+            <option value="">--</option>
+            <option value="asc">Earliest</option>
+            <option value="desc">Lastest</option>
+          </select>
+          <label for="filter">Filter: </label>
+          <select id="filter" name="completed">
+            <option value="">--</option>
+            <option value="true">Completed</option>
+            <option value="false">Incompelete</option>
+          </select>
+          <a id="filterBtn" href="">Apply</a>
+        </div>
+      </form>
+    </div>
+    <div class="taskList"></div>
+  </body>
+  <script>
+    let taskList = document.getElementsByClassName("taskList")[0];
+    for (task of <%-JSON.stringify(tasks)%>) {
+      const div = document.createElement("div");
+      div.className = "taskItem";
+      div.setAttribute("data-id", task._id);
+      div.setAttribute("data-completed", task.completed)
+      const p = document.createElement("P");
+      p.appendChild(document.createTextNode(task.description));
+      if (task.completed === true) {
+        p.className = "line-through";
+      }
+      div.appendChild(p);
+      const button = document.createElement("button");
+      button.innerHTML = "x";
+      button.setAttribute("id", "deleteBtn")
+      button.setAttribute("type", "button")
+      button.setAttribute("data-id", task._id)
+      div.appendChild(button);
+      taskList.appendChild(div);
+    }
+  </script>
+  <script src="/js/dashboard.js"></script>
+</html>
